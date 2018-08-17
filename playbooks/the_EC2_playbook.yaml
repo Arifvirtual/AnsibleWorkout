@@ -1,0 +1,22 @@
+# Thie play book pings the EC2 isntances and installs the "ngnix" server on those instance
+# $ export ANSIBLE_HOSTS=/etc/ansible/ec2.py
+# $ export EC2_INI_PATH=/etc/ansible/ec2.ini"
+# ansible-playbook playbooks/the_EC2_playbook.yaml -t onlyping -vvvv
+
+---
+- hosts: tag_Ansible_Slave
+  user: ec2-user
+  sudo: yes
+  
+  tasks:
+  - name: Ping the EC2 instances
+    tags: onlyping
+    ping:
+  
+  - name: Update all packages to latest
+    tags: onlyupdate
+    yum: name=* state=latest
+
+  - name: Install specific ngnix package for centos
+    tags: onlyngnix
+    yum: name='http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm' state=present
