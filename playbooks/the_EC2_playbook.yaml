@@ -13,10 +13,22 @@
     tags: onlyping
     ping:
   
-  - name: Update all packages to latest
-    tags: onlyupdate
-    yum: name=* state=latest
+#  - name: Update all packages to latest
+#    tags: onlyupdate
+#    yum: name=* state=latest
 
   - name: Install specific ngnix package for centos
     tags: onlyngnix
     yum: name='http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm' state=present
+
+  # Copy the indexpage from the ansible host to the EC2 Web server
+  - name: install index page
+    tags: CopyIndex
+    copy: src=../files/webpage.html dest=/var/www/html/index.html backup=yes
+    notify: restart ngnix
+
+  handlers:
+  - name: restart ngnix service
+    tags: RestartNgnix
+    service: name=ngnix state=started
+
