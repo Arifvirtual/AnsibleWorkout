@@ -1,0 +1,44 @@
+# This playbook will create a new user of the ansible hosts, sets the user password
+# Add remote user to sudoers, and configures the ssh access for that user on that system
+
+---
+
+- hosts: all
+  vars:
+    - remote_user: 'mrremote'
+    - remote_password: 'helpuser'
+
+  tasks:
+  - name: Add new user to the system
+    user:
+      name={{ remote_user }}
+      password={{ remote_password }}
+
+  - name: Add SSH public key to user remote
+    authorized_key:
+      user={{ remote_user }}
+      key="{{ lookup('file', '../files/workstation.pub') }} "
+
+  - name: Add this remote user to sudoers
+    lineinfile:
+      "dest=/etc/sudoers
+      regexp='^mrremote ALL'
+      line='mrremote ALL=(ALL) ALL'
+      state=present"
+
+  - name: Disallow SSH password authentication
+    lineinfile:
+      dest=/etc/ssh/sshd_config
+      regexp="^PasswordAuthentication"
+      line="PasswordAuthentication no"
+      state=present
+    notify:
+      - restart sshd
+
+  handlers:
+  - name: restart sshd
+    service:
+      name=sshd
+      state=restarted
+
+

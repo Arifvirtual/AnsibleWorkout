@@ -1,0 +1,9 @@
+
+---
+- hosts: all
+
+  tasks:
+  - name: Add SSH public key to the remote
+    authorized_key: 
+      user=arif 
+      key="{{ lookup('file', "../files/workstation.pub") }}"
