@@ -1,0 +1,27 @@
+
+---
+- hosts:
+  - 127.0.0.1
+  connection: local
+  gather_facts: False
+  pre_tasks:
+    - include_vars: '../inventories/staging/host_vars/ec2_variables.yml'
+  vars:
+    count: 3
+  tasks:
+  - name: Launch new EC2 instance-{{count}}
+    local_action: ec2
+        keypair={{ec2_keypair}}
+        group={{ec2_security_group}}
+        instance_type={{ec2_instance_type}}
+        region={{ec2_region}}
+        image={{ec2_image}}
+        instance_tags='{"Name":"{{ec2_tag_Name}}","Type":"{{ec2_tag_Type}}","Environment":"{{ec2_tag_Environment}}"}'
+        wait=true
+        count={{count}}
+    #volumes:
+    #  - device_name= /dev/sda1
+    #    volume_type={{ ec2_volume_type }}
+    #    volume_size={{ ec2_volume_size }}
+    #    delete_on_termination=true
+    register: ec2
